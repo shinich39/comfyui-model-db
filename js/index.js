@@ -129,7 +129,7 @@ function updateKeys(node) {
   let key = keyWidget.value;
   keyWidget.options.values = getKeys(ckpt);
   if (!key || keyWidget.options.values.indexOf(key) === -1) {
-    keyWidget.value = keyWidget.options.values.length > 0 ? keyWidget.options.values[0] : `NO_KEY`;
+    keyWidget.value = keyWidget.options.values?.[keyWidget.options.values.length - 1] || `NO_KEY`;
     return true;
   } else {
     return false;

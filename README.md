@@ -34,3 +34,4 @@ You can't change key name for simplify process flow.
 
 - Add output latent
 - Change widget positions
+- Default key change to last key of model
