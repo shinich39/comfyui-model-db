@@ -156,6 +156,13 @@ function updateValues(node) {
   }
 }
 
+function updateNode(node) {
+  const isKeyUpdated = updateKeys(node);
+  if (isKeyUpdated) {
+    updateValues(node);
+  }
+}
+
 function updateNodes() {
   for (const node of app.graph._nodes) {
     try {
@@ -166,10 +173,7 @@ function updateNodes() {
         console.log(CLASS_NAME, node);
       }
 
-      const isKeyUpdated = updateKeys(node);
-      if (isKeyUpdated) {
-        updateValues(node);
-      }
+      updateNode(node);
     } catch(err) {
       console.error(err);
     }
@@ -231,10 +235,9 @@ app.registerExtension({
         node.widgets.splice(next, 0, node.widgets.splice(prev, 1)[0]);
       })();
 
-      // new node
+      // the node created after initialize
       if (isInitialized) {
-        updateKeys(node);
-        updateValues(node);
+        updateNode(node);
       }
 
       function ckptWidgetChangeHandler(value) {
