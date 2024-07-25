@@ -2,7 +2,7 @@
 @author: shinich39
 @title: Model DB
 @nickname: Model DB
-@version: 1.0.0
+@version: 1.0.1
 @description: Store settings by model.
 """
 
@@ -19,7 +19,7 @@ import folder_paths as comfy_paths
 import latent_preview
 
 DEBUG = False
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 WEB_DIRECTORY = "./js"
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}

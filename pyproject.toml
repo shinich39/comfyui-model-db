@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-model-db"
 description = "Store settings by model."
-version = "1.0.0"
+version = "1.0.1"
 license = "LICENSE"
 
 [project.urls]
