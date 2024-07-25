@@ -180,7 +180,7 @@ class ModelDB():
   
   FUNCTION = "exec"
   RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "INT", "INT", "FLOAT", "STRING", "STRING", "FLOAT", "INT", "INT", "LATENT",)
-  RETURN_NAMES = ("model", "clip", "vae", "positive", "negative", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", "width", "height", "latent",)
+  RETURN_NAMES = ("MODEL", "CLIP", "VAE", "POSITIVE", "NEGATIVE", "SEED", "STEPS", "CFG", "SAMPLER_NAME", "SCHEDULER", "DENOISE", "WIDTH", "HEIGHT", "LATENT",)
 
   CATEGORY = "utils"
 

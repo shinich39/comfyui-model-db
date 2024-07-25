@@ -16,19 +16,19 @@ You can't change key name for simplify process flow.
 
 | Field        | Type  | Info                                      |
 |--------------|-------|-------------------------------------------|
-| model        | MODEL |                                           |
-| clip         | CLIP  |                                           |
-| vae          | VAE   |                                           |
-| positive     | TEXT  |                                           |
-| negative     | TEXT  |                                           |
-| seed         | INT   |                                           |
-| cfg          | FLOAT |                                           |
-| smapler_name | TEXT  | Can not link KSampler sampler_name input. |
-| scheduler    | TEXT  | Can not link KSampler scheduler input.    |
-| denoise      | FLOAT |                                           |
-| width        | INT   |                                           |
-| height       | INT   |                                           |
-| latent       | LATENT|                                           |
+| MODEL        | MODEL |                                           |
+| CLIP         | CLIP  |                                           |
+| VAE          | VAE   |                                           |
+| POSITIVE     | TEXT  |                                           |
+| NEGATIVE     | TEXT  |                                           |
+| SEED         | INT   |                                           |
+| CFG          | FLOAT |                                           |
+| SAMPLER_NAME | TEXT  | Can not link KSampler sampler_name input. |
+| SCHEDULER    | TEXT  | Can not link KSampler scheduler input.    |
+| DENOISE      | FLOAT |                                           |
+| WIDTH        | INT   |                                           |
+| HEIGHT       | INT   |                                           |
+| LATENT       | LATENT|                                           |
 
 ## Updates
 
