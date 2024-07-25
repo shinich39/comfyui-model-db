@@ -219,6 +219,20 @@ app.registerExtension({
       ckptWidget.callback = ckptWidgetChangeHandler;
       keyWidget.callback = keyWidgetChangeHandler;
 
+      // change add widget position
+      ;(function() {
+        const prev = node.widgets.findIndex(e => e.name === "Add");
+        const next = node.widgets.findIndex(e => e.name === "key") + 1;
+        node.widgets.splice(next, 0, node.widgets.splice(prev, 1)[0]);
+      })();
+
+      // change remove widget position
+      ;(function() {
+        const prev = node.widgets.findIndex(e => e.name === "Remove");
+        const next = node.widgets.findIndex(e => e.name === "key") + 2;
+        node.widgets.splice(next, 0, node.widgets.splice(prev, 1)[0]);
+      })();
+
       if (isInitialized && !keyWidget.value) {
         updateNode(node);
       }

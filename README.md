@@ -33,3 +33,4 @@ You can't change key name for simplify process flow.
 ## Updates
 
 - Add output latent
+- Change widget positions
