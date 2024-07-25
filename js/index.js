@@ -128,7 +128,12 @@ function updateKeys(node) {
   let ckpt = ckptWidget.value;
   let key = keyWidget.value;
   keyWidget.options.values = getKeys(ckpt);
-  keyWidget.value = keyWidget.options.values.length > 0 ? keyWidget.options.values[0] : `NO_KEY`;
+  if (!key || keyWidget.options.values.indexOf(key) === -1) {
+    keyWidget.value = keyWidget.options.values.length > 0 ? keyWidget.options.values[0] : `NO_KEY`;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function updateValues(node) {
@@ -151,11 +156,6 @@ function updateValues(node) {
   }
 }
 
-function updateNode(node) {
-  updateKeys(node);
-  updateValues(node);
-}
-
 function updateNodes() {
   for (const node of app.graph._nodes) {
     try {
@@ -166,28 +166,26 @@ function updateNodes() {
         console.log(CLASS_NAME, node);
       }
 
-      updateNode(node);
+      const isKeyUpdated = updateKeys(node);
+      if (isKeyUpdated) {
+        updateValues(node);
+      }
     } catch(err) {
       console.error(err);
     }
   }
 }
 
-function getConfig(widgetName) {
-	const { nodeData } = this.constructor;
-	return nodeData?.input?.required[widgetName] ?? nodeData?.input?.optional?.[widgetName];
-}
-
 app.registerExtension({
 	name: "shinich39.ModelDB",
   setup() {
-    // init
+    // init, update old nodes
     getDefaultValues()
-      .then((e) => {DEFAULT_VALUES = e;})
+      .then((e) => { DEFAULT_VALUES = e; })
       .then(getData)
-      .then((e) => {db = e;})
+      .then((e) => { db = e; })
       .then(() => { isInitialized = true; })
-      // .then(updateNodes);
+      .then(updateNodes);
   },
   nodeCreated(node) {
     try {
@@ -233,8 +231,10 @@ app.registerExtension({
         node.widgets.splice(next, 0, node.widgets.splice(prev, 1)[0]);
       })();
 
-      if (isInitialized && !keyWidget.value) {
-        updateNode(node);
+      // new node
+      if (isInitialized) {
+        updateKeys(node);
+        updateValues(node);
       }
 
       function ckptWidgetChangeHandler(value) {
