@@ -187,7 +187,7 @@ app.registerExtension({
       .then(getData)
       .then((e) => {db = e;})
       .then(() => { isInitialized = true; })
-      .then(updateNodes);
+      // .then(updateNodes);
   },
   nodeCreated(node) {
     try {
@@ -206,13 +206,20 @@ app.registerExtension({
         return item.name === "key";
       });
 
-      const addWidget = node.addWidget("button", "Add", "add", addWidgetClickHandler);
-      const removeWidget = node.addWidget("button", "Remove", "remove", removeWidgetClickHandler);
+      const addWidget = node.addWidget("button", "Add", null, addWidgetClickHandler, {
+        serialize: false
+      });
+      addWidget.serializeValue = () => undefined;
+
+      const removeWidget = node.addWidget("button", "Remove", null, removeWidgetClickHandler, {
+        serialize: false
+      });
+      removeWidget.serializeValue = () => undefined;
 
       ckptWidget.callback = ckptWidgetChangeHandler;
       keyWidget.callback = keyWidgetChangeHandler;
 
-      if (isInitialized) {
+      if (isInitialized && !keyWidget.value) {
         updateNode(node);
       }
 

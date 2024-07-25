@@ -28,3 +28,8 @@ You can't change key name for simplify process flow.
 | denoise      | FLOAT |                                           |
 | width        | INT   |                                           |
 | height       | INT   |                                           |
+| latent       | LATENT|                                           |
+
+## Updates
+
+- Add output latent

@@ -8,11 +8,15 @@
 
 from server import PromptServer
 from aiohttp import web
+import torch
+
 import os
 import json
 import comfy
 import folder_paths
 import folder_paths as comfy_paths
+
+import latent_preview
 
 DEBUG = False
 VERSION = "1.0.0"
@@ -106,9 +110,51 @@ async def remove_db(request):
 
   return web.json_response(json_data)
 
+def load_ckpt(ckpt_name):
+  if ckpt_name:
+    ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
+    ckpt = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+    return (ckpt[0], ckpt[1], ckpt[2])
+  else:
+    return (None, None, None)
+
+# /ComfuUI/nodes.py EmptyLatentImage
+def generate_empty_latent_image(device, width, height, batch_size = 1):
+  latent = torch.zeros([batch_size, 4, height // 8, width // 8], device=device)
+  return {"samples":latent}
+
+# /ComfuUI/nodes.py
+def common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent, denoise=1.0, disable_noise=False, start_step=None, last_step=None, force_full_denoise=False):
+    latent_image = latent["samples"]
+    if disable_noise:
+        noise = torch.zeros(latent_image.size(), dtype=latent_image.dtype, layout=latent_image.layout, device="cpu")
+    else:
+        batch_inds = latent["batch_index"] if "batch_index" in latent else None
+        noise = comfy.sample.prepare_noise(latent_image, seed, batch_inds)
+
+    noise_mask = None
+    if "noise_mask" in latent:
+        noise_mask = latent["noise_mask"]
+
+    callback = latent_preview.prepare_callback(model, steps)
+    disable_pbar = not comfy.utils.PROGRESS_BAR_ENABLED
+    samples = comfy.sample.sample(model, noise, steps, cfg, sampler_name, scheduler, positive, negative, latent_image,
+                                  denoise=denoise, disable_noise=disable_noise, start_step=start_step, last_step=last_step,
+                                  force_full_denoise=force_full_denoise, noise_mask=noise_mask, callback=callback, disable_pbar=disable_pbar, seed=seed)
+    out = latent.copy()
+    out["samples"] = samples
+    return out
+
+# /ComfuUI/nodes.py CLIPTextEncode
+def encode_text(clip, text):
+  tokens = clip.tokenize(text)
+  cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+  return [[cond, {"pooled_output": pooled}]]
+
 # main  
 class ModelDB():
   def __init__(self):
+    self.device = comfy.model_management.intermediate_device()
     pass
 
   @classmethod
@@ -133,8 +179,8 @@ class ModelDB():
     }
   
   FUNCTION = "exec"
-  RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "INT", "INT", "FLOAT", "STRING", "STRING", "FLOAT", "INT", "INT",)
-  RETURN_NAMES = ("model", "clip", "vae", "positive", "negative", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", "width", "height",)
+  RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING", "STRING", "INT", "INT", "FLOAT", "STRING", "STRING", "FLOAT", "INT", "INT", "LATENT",)
+  RETURN_NAMES = ("model", "clip", "vae", "positive", "negative", "seed", "steps", "cfg", "sampler_name", "scheduler", "denoise", "width", "height", "latent",)
 
   CATEGORY = "utils"
 
@@ -153,14 +199,31 @@ class ModelDB():
       print(f"width: {width}")
       print(f"height: {height}")
 
-    # load ckpt
-    if ckpt_name:
-      ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
-      ckpt = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
-    else:
-      ckpt = [None, None, None]
+    model, clip, vae = load_ckpt(ckpt_name)
+
+    if DEBUG:
+      print(f"model: {model}")
+      print(f"clip: {clip}")
+      print(f"vae: {vae}")
+
+    encoded_positive = encode_text(clip, positive)
+    encoded_negative = encode_text(clip, negative)
+
+    if DEBUG:
+      print(f"encoded_positive: {encoded_positive}")
+      print(f"encoded_negative: {encoded_negative}")
     
-    return (ckpt[0], ckpt[1], ckpt[2], positive, negative, seed, steps, cfg, sampler_name, scheduler, denoise, width, height)
+    latent_image = generate_empty_latent_image(self.device, width, height)
+
+    if DEBUG:
+      print(f"latent_image: {latent_image}")
+
+    latent = common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, encoded_positive, encoded_negative, latent_image, denoise=denoise)
+
+    if DEBUG:
+      print(f"latent: {latent}")
+
+    return (model, clip, vae, positive, negative, seed, steps, cfg, sampler_name, scheduler, denoise, width, height, latent)
 
 NODE_CLASS_MAPPINGS["Model DB"] = ModelDB
 NODE_DISPLAY_NAME_MAPPINGS["Model DB"] = "Model DB"
