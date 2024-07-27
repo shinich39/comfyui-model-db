@@ -2,7 +2,7 @@
 name = "comfyui-model-db"
 description = "Store settings by model."
 version = "1.0.1"
-license = "LICENSE"
+license = { file = "LICENSE" }
 
 [project.urls]
 Repository = "https://github.com/shinich39/comfyui-model-db"
