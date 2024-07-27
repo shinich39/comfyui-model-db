@@ -208,6 +208,18 @@ app.registerExtension({
         return item.name === "key";
       });
 
+      const posWidget = node.widgets.find(function(item) {
+        return item.name === "positive";
+      });
+      posWidget.options.getMinHeight = () => 128;
+      // posWidget.options.getMaxHeight = () => 256;
+
+      const negWidget = node.widgets.find(function(item) {
+        return item.name === "negative";
+      });
+      negWidget.options.getMinHeight = () => 128;
+      // negWidget.options.getMaxHeight = () => 256;
+
       const addWidget = node.addWidget("button", "Add", null, addWidgetClickHandler, {
         serialize: false
       });
