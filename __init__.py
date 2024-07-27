@@ -27,7 +27,7 @@ __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
 
 __DIRNAME = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(__DIRNAME, "db.json")
-MAX_RESOLUTION=16384
+MAX_RESOLUTION = 16384
 
 def chk_db():
   if os.path.exists(DB_PATH) == False:

@@ -3,7 +3,6 @@ import { api } from "../../scripts/api.js";
 import { $el } from "../../scripts/ui.js";
 import * as util from "./libs/util.min.js";
 
-let DEBUG = false;
 let isInitialized = false;
 let CLASS_NAME = "Model DB";
 let DEFAULT_VALUES = {};
@@ -25,21 +24,11 @@ let db = {}; // { MODEL_NAME: { KEY: { ...OPEIONS }} }
 async function getDefaultValues() {
   let response = await api.fetchApi("/shinich39/model-db/get-default-values", { cache: "no-store" });
   let data = await response.json();
-  
-  if (DEBUG) {
-    console.log("GET /shinich39/model-db/get-default-values", data);
-  }
-
   return data;
 }
 
 async function getData() {
   let response = await api.fetchApi("/shinich39/model-db/get-data", { cache: "no-store" });
-
-  if (DEBUG) {
-    console.log("GET /shinich39/model-db/get-data", response);
-  }
-
   return await response.json();
 }
 
@@ -52,13 +41,10 @@ async function setData(ckpt, key, values) {
     body: JSON.stringify({ ckpt, key, values }),
   });
 
-  if (DEBUG) {
-    console.log("POST /shinich39/model-db/set-data", response);
-  }
-
   if (response.status !== 200) {
     throw new Error(response.statusText);
   }
+
   return await response.json();
 }
 
@@ -70,10 +56,6 @@ async function removeData(ckpt, key) {
     },
     body: JSON.stringify({ ckpt, key }),
   });
-
-  if (DEBUG) {
-    console.log("POST /shinich39/model-db/remove-data", response);
-  }
 
   if (response.status !== 200) {
     throw new Error(response.statusText);
@@ -169,10 +151,6 @@ function updateNodes() {
       if (node.comfyClass !== CLASS_NAME) {
         continue;
       }
-      if (DEBUG) {
-        console.log(CLASS_NAME, node);
-      }
-
       updateNode(node);
     } catch(err) {
       console.error(err);
@@ -195,9 +173,6 @@ app.registerExtension({
     try {
       if (node.comfyClass !== CLASS_NAME) {
         return;
-      }
-      if (DEBUG) {
-        console.log(CLASS_NAME, node);
       }
 
       const ckptWidget = node.widgets.find(function(item) {
@@ -253,17 +228,11 @@ app.registerExtension({
       }
 
       function ckptWidgetChangeHandler(value) {
-        if (DEBUG) {
-          console.log("ckpt widget changed:", value);
-        }
         updateKeys(node);
         updateValues(node);
       }
   
       function keyWidgetChangeHandler(value) {
-        if (DEBUG) {
-          console.log("key widget changed:", value);
-        }
         if (!value) {
           keyWidget.value = "NO_KEY";
         }
@@ -272,10 +241,6 @@ app.registerExtension({
       }
 
       function addWidgetClickHandler() {
-        if (DEBUG) {
-          console.log("add widget cliked.");
-        }
-
         let ckpt = ckptWidget.value;
         let key = getCurrentKey();
         let values = getNodeValues(node);
@@ -290,10 +255,6 @@ app.registerExtension({
       }
 
       function removeWidgetClickHandler() {
-        if (DEBUG) {
-          console.log("remove widget cliked.");
-        }
-
         let ckpt = ckptWidget.value;
         let key = keyWidget.value;
         let idx = keyWidget.options.values.indexOf(key);
